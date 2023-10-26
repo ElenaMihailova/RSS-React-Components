@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import Search from './Search/Search';
 import Result from './Result/Result';
-import Universe from './Universe/universe';
+import Universe from './Universe/Universe';
 import './Main.css';
 
 type Props = {
@@ -9,19 +9,19 @@ type Props = {
 };
 
 type State = {
-  search: string;
+  searchQuery: string;
 };
 
 class Main extends Component<Props, State> {
   constructor(props: Props | Readonly<Props>) {
     super(props);
     this.state = {
-      search: 'empty',
+      searchQuery: 'empty',
     };
   }
 
-  updateData = (value: string) => {
-    this.setState({ search: value });
+  updateSearchQuery = (value: string) => {
+    this.setState({ searchQuery: value });
   };
 
   render() {
@@ -32,8 +32,8 @@ class Main extends Component<Props, State> {
         </div>
         <div className="search-result">
           {' '}
-          <Search onSearchSubmit={this.updateData} />
-          <Result data={this.state.search} />
+          <Search onSearchSubmit={this.updateSearchQuery} />
+          <Result data={this.state.searchQuery} />
         </div>
       </div>
     );
