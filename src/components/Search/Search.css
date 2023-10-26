@@ -1,0 +1,16 @@
+.search {
+  height: 30%;
+}
+
+.search__input {
+  height: 2em;
+  padding: 0.8em 1em;
+}
+
+.search__input:hover {
+  background-position: 100% 0;
+}
+
+.search__input:focus {
+  background-position: 100% 0;
+}

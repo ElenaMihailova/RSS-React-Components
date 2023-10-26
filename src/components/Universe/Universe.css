@@ -1,0 +1,42 @@
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+}
+
+.star0 {
+  height: 1px;
+  width: 1px;
+  opacity: 1;
+  position: absolute;
+}
+
+.star1 {
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  opacity: 30%;
+  position: absolute;
+}
+
+.star2 {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  opacity: 10%;
+  position: absolute;
+}
+
+.star3 {
+  height: 4px;
+  width: 4px;
+  border-radius: 50%;
+  opacity: 1;
+  position: absolute;
+}
+
+#universe {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
