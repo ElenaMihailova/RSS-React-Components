@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import ThrowErrorButton from '../ErrorBoundary/ThrowErrorButton';
 import './Search.css';
 
 type SearchProps = {
@@ -66,6 +67,7 @@ export default class Search extends Component<SearchProps, SearchState> {
             Search
           </button>
         </form>
+        <ThrowErrorButton />
       </div>
     );
   }
