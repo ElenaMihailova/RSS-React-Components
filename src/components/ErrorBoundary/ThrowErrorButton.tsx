@@ -1,12 +1,27 @@
 import { Component } from 'react';
 
-class ThrowErrorButton extends Component {
-  handleClick = () => {
-    throw new Error('Test error');
+type Props = Record<string, never>;
+
+interface State {
+  hasError: boolean;
+}
+
+class ThrowErrorButton extends Component<Props, State> {
+  state = {
+    hasError: false,
   };
 
+  clickButtonError = () => {
+    this.setState({ hasError: true });
+  };
+
+  componentDidUpdate() {
+    if (this.state.hasError) {
+      throw new Error('Oops!');
+    }
+  }
   render() {
-    return <button onClick={this.handleClick}>Throw Error</button>;
+    return <button onClick={this.clickButtonError}>ThrowError</button>;
   }
 }
 
