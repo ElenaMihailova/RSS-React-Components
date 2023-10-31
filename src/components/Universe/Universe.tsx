@@ -1,9 +1,29 @@
-//source https://codepen.io/sacsam005/pen/BaJmaXy
-
-import { Component } from 'react';
+import React, { Component } from 'react';
 import './Universe.css';
 
-class Universe extends Component {
+interface Star {
+  key: number;
+  className: string;
+  style: object;
+  ypos: number;
+  speed: number;
+  width: number;
+}
+
+interface UniverseState {
+  stars: Star[];
+}
+class Universe extends Component<Record<string, never>, UniverseState> {
+  universeRef: React.RefObject<HTMLDivElement>;
+
+  constructor(props: Record<string, never>) {
+    super(props);
+    this.state = {
+      stars: [],
+    };
+    this.universeRef = React.createRef();
+  }
+
   componentDidMount() {
     this.createAnimation();
   }
@@ -11,46 +31,45 @@ class Universe extends Component {
   createAnimation() {
     const starCount = 400;
     const maxTime = 80;
-    const universe = document.getElementById('universe');
-
-    if (!universe) {
-      console.error('Element with id="universe" not found');
-      return;
-    }
-
     const { innerWidth: width, innerHeight: height } = window;
+    const newStars = [];
 
     for (let i = 0; i < starCount; ++i) {
       const ypos = Math.round(Math.random() * height);
-      const star = document.createElement('div');
       const speed = 1800 * (Math.random() * maxTime + 3);
 
       const starClass = 'star' + (3 - Math.floor(speed / 1500 / 8));
 
-      star.setAttribute('class', starClass);
-      star.style.backgroundColor = '#B4FEE7';
-
-      universe.appendChild(star);
-      star.animate(
-        [
-          {
-            transform: `translate3d(${width}px, ${ypos}px, 0)`,
-          },
-          {
-            transform: `translate3d(-${Math.random() * 256}px, ${ypos}px, 0)`,
-          },
-        ],
-        {
-          delay: Math.random() * -speed,
-          duration: speed,
-          iterations: 1000,
-        }
-      );
+      newStars.push({
+        key: i,
+        className: starClass,
+        style: {
+          backgroundColor: '#B4FEE7',
+          animation: `moveStar ${speed}ms linear infinite`,
+          animationDelay: `${Math.random() * -speed}ms`,
+          top: `${ypos}px`,
+        },
+        ypos: ypos,
+        speed: speed,
+        width: width,
+      });
     }
+
+    this.setState({ stars: newStars });
   }
 
   render() {
-    return <div id="universe"></div>;
+    return (
+      <div ref={this.universeRef} id="universe">
+        {this.state.stars.map((star) => (
+          <div
+            key={star.key}
+            className={star.className}
+            style={star.style}
+          ></div>
+        ))}
+      </div>
+    );
   }
 }
 

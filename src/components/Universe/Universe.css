@@ -12,8 +12,8 @@
 }
 
 .star1 {
-  height: 6px;
-  width: 6px;
+  height: 8px;
+  width: 8px;
   border-radius: 50%;
   opacity: 30%;
   position: absolute;
@@ -39,4 +39,13 @@
   position: relative;
   width: 100vw;
   height: 100vh;
+}
+
+@keyframes moveStar {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-100vw);
+  }
 }
