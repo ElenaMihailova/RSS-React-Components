@@ -11,7 +11,12 @@ type PlanetListProps = {
   error: Error | null;
 };
 
-const PlanetList: React.FC<PlanetListProps> = ({ items, isLoaded, error }) => {
+const PlanetList: React.FC<PlanetListProps> = ({
+  data,
+  items,
+  isLoaded,
+  error,
+}) => {
   const renderPlanetDetails = (item: PlanetInfo) => {
     return (
       <div key={item.name} className="result__wrapper">
@@ -42,16 +47,16 @@ const PlanetList: React.FC<PlanetListProps> = ({ items, isLoaded, error }) => {
     );
   };
 
+  if (!data) {
+    return <PlanetListGrid items={items} />;
+  }
+
   if (error) {
     return <p>Error: {error.message}</p>;
   }
 
   if (!isLoaded) {
     return <Loader />;
-  }
-
-  if (items.length === 0) {
-    return <NotFoundMessage />;
   }
 
   const storageKey = localStorage.getItem('inputKey');
@@ -61,14 +66,17 @@ const PlanetList: React.FC<PlanetListProps> = ({ items, isLoaded, error }) => {
     const filteredItems = items.filter((item) =>
       item.name.toLowerCase().includes(trail)
     );
+
+    if (filteredItems.length === 0) {
+      return <NotFoundMessage />;
+    }
+
     return (
       <div className="result">
         {filteredItems.map((item) => renderPlanetDetails(item))}
       </div>
     );
   }
-
-  return <PlanetListGrid items={items} />;
 };
 
 export default PlanetList;

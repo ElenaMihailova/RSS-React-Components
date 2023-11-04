@@ -4,22 +4,24 @@ import './Pagination.css';
 
 export interface PageInfo {
   count: number;
-  next: string | null;
   pages: number;
-  prev: string | null;
 }
 
 interface PaginationProps {
   currentPage: number;
   info: PageInfo;
+  itemsPerPage: number;
   onNavigate: (page: number) => void;
+  onItemsPerPageChange: (number: number) => void;
   isEmpty: boolean;
 }
 
 const Pagination = ({
   currentPage,
   info,
+  itemsPerPage,
   onNavigate,
+  onItemsPerPageChange,
   isEmpty,
 }: PaginationProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,8 +32,25 @@ const Pagination = ({
     setSearchParams(searchParams);
   };
 
+  const handleItemsPerPageChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newItemsPerPage = Number(event.target.value);
+    onItemsPerPageChange(newItemsPerPage);
+    setPage(1);
+  };
+
   return (
     <div className="pagination">
+      <select
+        value={itemsPerPage}
+        onChange={handleItemsPerPageChange}
+        className="pagination__items-per-page"
+      >
+        <option value="3">3</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+      </select>
       <button
         type="button"
         disabled={currentPage === 1 || isEmpty}
@@ -40,7 +59,7 @@ const Pagination = ({
       >
         &lt;
       </button>
-      <span className="pagination__page"> {currentPage}</span>
+      <span className="pagination__page">{currentPage}</span>
       <button
         type="button"
         className="pagination__button pagination__button--next"

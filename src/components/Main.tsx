@@ -17,12 +17,12 @@ const Main: React.FC<Props> = () => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState<PlanetInfo[]>([]);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [currentItems, setCurrentItems] = useState<PlanetInfo[]>([]);
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     count: 0,
-    next: null,
     pages: 0,
-    prev: null,
   });
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,32 +30,41 @@ const Main: React.FC<Props> = () => {
 
   const updateSearchQuery = (value: string) => {
     setSearchQuery(value);
-    fetchDataForList(value, 1);
+    fetchDataForList(value);
   };
 
-  const fetchDataForList = (query: string, page: number) => {
+  const fetchDataForList = (query: string) => {
     fetchDataForPlanetList(
       query,
-      page,
       setIsLoaded,
       setItems,
       setError,
-      setPageInfo
+      setPageInfo,
+      itemsPerPage
     );
   };
 
   const isEmpty = items.length === 0;
 
   useEffect(() => {
-    if (searchQuery && currentPage !== 1) {
-      setSearchParams({ page: '1' });
-    } else {
-      fetchDataForList(searchQuery, currentPage);
-    }
-  }, [currentPage, searchQuery]);
+    fetchDataForList(searchQuery);
+  }, []);
+
+  useEffect(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const currentItems = items.slice(start, end);
+    setCurrentItems(currentItems);
+  }, [items, currentPage, itemsPerPage]);
 
   const handleNavigate = (newPage: number) => {
     setSearchParams({ page: newPage.toString() });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    fetchDataForList(searchQuery);
+    setSearchParams({ page: '1' });
   };
 
   return (
@@ -69,13 +78,15 @@ const Main: React.FC<Props> = () => {
         <PlanetList
           data={searchQuery}
           isLoaded={isLoaded}
-          items={items}
+          items={currentItems}
           error={error}
         />
         <Pagination
           currentPage={currentPage}
           info={pageInfo}
+          itemsPerPage={itemsPerPage}
           onNavigate={handleNavigate}
+          onItemsPerPageChange={handleItemsPerPageChange}
           isEmpty={isEmpty}
         />
       </div>

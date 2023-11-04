@@ -12,6 +12,7 @@ export const getAllData = async (url: string): Promise<PlanetInfo[]> => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
+    console.log('Полученные данные:', data);
     results = results.concat(data.results as PlanetInfo[]);
     if (data.next) {
       fetchUrl = data.next;
@@ -19,40 +20,31 @@ export const getAllData = async (url: string): Promise<PlanetInfo[]> => {
       shouldContinue = false;
     }
   }
-  console.log(results);
   return results;
 };
 
 export const fetchDataForPlanetList = async (
   searchQuery: string | null,
-  page: number,
   setIsLoaded: (isLoaded: boolean) => void,
   setItems: (items: PlanetInfo[]) => void,
   setError: (error: Error) => void,
-  setPageInfo: (info: PageInfo) => void
+  setPageInfo: (info: PageInfo) => void,
+  itemsPerPage: number
 ) => {
   const baseUrl = 'https://swapi.dev/api/planets/';
   const searchParam = searchQuery
     ? `search=${encodeURIComponent(searchQuery)}&`
     : '';
-  const pageParam = searchQuery ? `page=1` : `page=${page}`;
-  const url = `${baseUrl}?${searchParam}${pageParam}`;
 
   setIsLoaded(false);
 
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
+    const allData = await getAllData(`${baseUrl}?${searchParam}`);
     setIsLoaded(true);
-    setItems(data.results as PlanetInfo[]);
+    setItems(allData);
     setPageInfo({
-      count: data.count,
-      next: data.next,
-      pages: Math.ceil(data.count / 10),
-      prev: data.previous,
+      count: allData.length,
+      pages: Math.ceil(allData.length / itemsPerPage),
     });
   } catch (error) {
     setIsLoaded(true);
