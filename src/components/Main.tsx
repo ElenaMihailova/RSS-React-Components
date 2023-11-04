@@ -13,7 +13,7 @@ type Props = {
 };
 
 const Main: React.FC<Props> = () => {
-  const [searchQuery, setSearchQuery] = useState<string>('empty');
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState<PlanetInfo[]>([]);
