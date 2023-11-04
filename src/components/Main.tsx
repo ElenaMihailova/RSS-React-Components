@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Search from './Search/Search';
 import Result from './Result/Result';
 import Universe from './Universe/Universe';
 import './Main.css';
+import Pagination, { PageInfo } from './Pagination/Pagination';
 
 type Props = {
   children?: JSX.Element;
@@ -11,8 +13,24 @@ type Props = {
 const Main: React.FC<Props> = () => {
   const [searchQuery, setSearchQuery] = useState<string>('empty');
 
+  const [pageInfo] = useState<PageInfo>({
+    count: 0,
+    next: null,
+    pages: 0,
+    prev: null,
+  });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
   const updateSearchQuery = (value: string) => {
     setSearchQuery(value);
+  };
+
+  useEffect(() => {}, [currentPage]);
+
+  const handleNavigate = (newPage: number) => {
+    setSearchParams({ page: newPage.toString() });
   };
 
   return (
@@ -24,6 +42,11 @@ const Main: React.FC<Props> = () => {
         {' '}
         <Search onSearchSubmit={updateSearchQuery} />
         <Result data={searchQuery} />
+        <Pagination
+          currentPage={currentPage}
+          info={pageInfo}
+          onNavigate={handleNavigate}
+        />
       </div>
     </div>
   );
