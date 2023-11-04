@@ -13,7 +13,7 @@ type Props = {
 };
 
 const Main: React.FC<Props> = () => {
-  const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [error, setError] = useState<Error | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState<PlanetInfo[]>([]);
@@ -32,7 +32,7 @@ const Main: React.FC<Props> = () => {
     fetchDataForList(value);
   };
 
-  const fetchDataForList = (query: string) => {
+  const fetchDataForList = (query: string | null) => {
     fetchDataForPlanetList(query, setIsLoaded, setItems, setError);
   };
 
