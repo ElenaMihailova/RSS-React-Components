@@ -23,31 +23,45 @@ const Results: React.FC<ResultsProps> = ({ data }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState<PlanetInfo[]>([]);
 
+  const getAllData = async (url: string): Promise<PlanetInfo[]> => {
+    let results: PlanetInfo[] = [];
+    let fetchUrl = url;
+    let shouldContinue = true;
+
+    while (shouldContinue) {
+      const response = await fetch(fetchUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      results = results.concat(data.results as PlanetInfo[]);
+      if (data.next) {
+        fetchUrl = data.next;
+      } else {
+        shouldContinue = false;
+      }
+    }
+    console.log(results);
+    return results;
+  };
+
   const getData = () => {
     const storageKey = localStorage.getItem('inputKey');
-    const url = storageKey
-      ? `https://swapi.dev/api/planets/?search=${storageKey}`
-      : 'https://swapi.dev/api/planets/';
+    const baseUrl = 'https://swapi.dev/api/planets/';
+    const searchParam = storageKey ? `?search=${storageKey}` : '';
+    const url = baseUrl + searchParam;
 
     setIsLoaded(false);
 
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
+    getAllData(url)
+      .then((results) => {
+        setIsLoaded(true);
+        setItems(results);
       })
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setItems(result.results);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+      .catch((error) => {
+        setIsLoaded(true);
+        setError(error);
+      });
   };
 
   useEffect(() => {
