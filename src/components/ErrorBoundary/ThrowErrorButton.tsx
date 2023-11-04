@@ -1,28 +1,19 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 
-type Props = Record<string, never>;
+const ThrowErrorButton: React.FC = () => {
+  const [hasError, setHasError] = useState(false);
 
-interface State {
-  hasError: boolean;
-}
-
-class ThrowErrorButton extends Component<Props, State> {
-  state = {
-    hasError: false,
-  };
-
-  clickButtonError = () => {
-    this.setState({ hasError: true });
-  };
-
-  componentDidUpdate() {
-    if (this.state.hasError) {
+  useEffect(() => {
+    if (hasError) {
       throw new Error('Oops!');
     }
-  }
-  render() {
-    return <button onClick={this.clickButtonError}>ThrowError</button>;
-  }
-}
+  }, [hasError]);
+
+  const clickButtonError = () => {
+    setHasError(true);
+  };
+
+  return <button onClick={clickButtonError}>ThrowError</button>;
+};
 
 export default ThrowErrorButton;

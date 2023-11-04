@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import Loader from '../Loader/Loader';
 import './Result.css';
 
@@ -15,33 +15,21 @@ export interface PlanetInfo {
 }
 
 type ResultsProps = {
-  children?: JSX.Element;
   data?: string;
 };
 
-type ResultsState = {
-  error: null | Error;
-  isLoaded: boolean;
-  items: Array<PlanetInfo>;
-};
+const Results: React.FC<ResultsProps> = ({ data }) => {
+  const [error, setError] = useState<Error | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [items, setItems] = useState<PlanetInfo[]>([]);
 
-export default class Results extends Component<ResultsProps, ResultsState> {
-  constructor(props: ResultsProps | Readonly<ResultsProps>) {
-    super(props);
-    this.state = {
-      error: null,
-      isLoaded: false,
-      items: [],
-    };
-  }
-
-  getData = () => {
+  const getData = () => {
     const storageKey = localStorage.getItem('inputKey');
     const url = storageKey
       ? `https://swapi.dev/api/planets/?search=${storageKey}`
       : 'https://swapi.dev/api/planets/';
 
-    this.setState({ isLoaded: false });
+    setIsLoaded(false);
 
     fetch(url)
       .then((response) => {
@@ -52,31 +40,21 @@ export default class Results extends Component<ResultsProps, ResultsState> {
       })
       .then(
         (result) => {
-          this.setState({
-            isLoaded: true,
-            items: result.results,
-          });
+          setIsLoaded(true);
+          setItems(result.results);
         },
         (error) => {
-          this.setState({
-            isLoaded: true,
-            error,
-          });
+          setIsLoaded(true);
+          setError(error);
         }
       );
   };
 
-  componentDidMount(): void {
-    this.getData();
-  }
+  useEffect(() => {
+    getData();
+  }, [data]);
 
-  componentDidUpdate(prevProps: ResultsProps): void {
-    if (this.props.data !== prevProps.data) {
-      this.getData();
-    }
-  }
-
-  renderPlanetDetails(item: PlanetInfo) {
+  const renderPlanetDetails = (item: PlanetInfo) => {
     return (
       <div key={item.name} className="result__wrapper">
         <p>
@@ -104,54 +82,50 @@ export default class Results extends Component<ResultsProps, ResultsState> {
         </p>
       </div>
     );
+  };
+
+  if (error) {
+    return <p>Error: {error.message}</p>;
   }
 
-  render() {
-    const { error, isLoaded, items } = this.state;
+  if (!isLoaded) {
+    return <Loader />;
+  }
 
-    if (error) {
-      return <p>Error: {error.message}</p>;
-    }
-
-    if (!isLoaded) {
-      return <Loader />;
-    }
-
-    if (items.length === 0) {
-      return <>Nothing found</>;
-    }
-
-    const storageKey = localStorage.getItem('inputKey');
-
-    if (storageKey) {
-      const trail = storageKey.trim().toLowerCase();
-      const filteredItems = items.filter((item) =>
-        item.name.toLowerCase().includes(trail)
-      );
-      return (
-        <div className="result">
-          {filteredItems.map(this.renderPlanetDetails)}
-        </div>
-      );
-    }
-
+  if (items.length === 0) {
     return (
-      <div className="result result--all">
-        {items.map((item) => (
-          <div key={item.name} className="result__wrapper result__wrapper--all">
-            <p>{`name: ${item.name}`}</p>
-            <p>{`rotation_period: ${item.rotation_period} `}</p>
-            <p>{`orbital_period: ${item.orbital_period}`}</p>
-            <p> etc.</p>
-            {/* <p>{`diameter: ${item.diameter}`}</p>
-            <p>{`climate: ${item.climate}`}</p>
-            <p>{`gravity: ${item.gravity}`}</p>
-            <p>{`population: ${item.population}`}</p>
-            <p>{`terrain: ${item.terrain}`}</p>
-            <p>{`surface_water: ${item.surface_water}`}</p> */}
-          </div>
-        ))}
+      <>
+        <p className="search__text">Nothing found</p>
+      </>
+    );
+  }
+
+  const storageKey = localStorage.getItem('inputKey');
+
+  if (storageKey) {
+    const trail = storageKey.trim().toLowerCase();
+    const filteredItems = items.filter((item) =>
+      item.name.toLowerCase().includes(trail)
+    );
+    return (
+      <div className="result">
+        {filteredItems.map((item) => renderPlanetDetails(item))}
       </div>
     );
   }
-}
+
+  return (
+    <div className="result result--all">
+      {items.map((item) => (
+        <div key={item.name} className="result__wrapper result__wrapper--all">
+          <p>{`name: ${item.name}`}</p>
+          <p>{`rotation_period: ${item.rotation_period} `}</p>
+          <p>{`orbital_period: ${item.orbital_period}`}</p>
+          <p> etc.</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default Results;

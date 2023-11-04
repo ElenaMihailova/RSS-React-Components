@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import Search from './Search/Search';
 import Result from './Result/Result';
 import Universe from './Universe/Universe';
@@ -8,36 +8,25 @@ type Props = {
   children?: JSX.Element;
 };
 
-type State = {
-  searchQuery: string;
-};
+const Main: React.FC<Props> = () => {
+  const [searchQuery, setSearchQuery] = useState<string>('empty');
 
-class Main extends Component<Props, State> {
-  constructor(props: Props | Readonly<Props>) {
-    super(props);
-    this.state = {
-      searchQuery: 'empty',
-    };
-  }
-
-  updateSearchQuery = (value: string) => {
-    this.setState({ searchQuery: value });
+  const updateSearchQuery = (value: string) => {
+    setSearchQuery(value);
   };
 
-  render() {
-    return (
-      <div className="container">
-        <div className="universe">
-          <Universe />
-        </div>
-        <div className="search-result">
-          {' '}
-          <Search onSearchSubmit={this.updateSearchQuery} />
-          <Result data={this.state.searchQuery} />
-        </div>
+  return (
+    <div className="container">
+      <div className="universe">
+        <Universe />
       </div>
-    );
-  }
-}
+      <div className="search-result">
+        {' '}
+        <Search onSearchSubmit={updateSearchQuery} />
+        <Result data={searchQuery} />
+      </div>
+    </div>
+  );
+};
 
 export default Main;

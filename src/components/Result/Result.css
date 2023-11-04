@@ -33,3 +33,9 @@
   margin: 0;
   text-align: start;
 }
+
+.search__text {
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px;
+}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Universe.css';
 
 interface Star {
@@ -10,25 +10,15 @@ interface Star {
   width: number;
 }
 
-interface UniverseState {
-  stars: Star[];
-}
-class Universe extends Component<Record<string, never>, UniverseState> {
-  universeRef: React.RefObject<HTMLDivElement>;
+const Universe: React.FC = () => {
+  const [stars, setStars] = useState<Star[]>([]);
+  const universeRef = useRef<HTMLDivElement>(null);
 
-  constructor(props: Record<string, never>) {
-    super(props);
-    this.state = {
-      stars: [],
-    };
-    this.universeRef = React.createRef();
-  }
+  useEffect(() => {
+    createAnimation();
+  }, []);
 
-  componentDidMount() {
-    this.createAnimation();
-  }
-
-  createAnimation() {
+  const createAnimation = () => {
     const starCount = 400;
     const maxTime = 80;
     const { innerWidth: width, innerHeight: height } = window;
@@ -55,22 +45,16 @@ class Universe extends Component<Record<string, never>, UniverseState> {
       });
     }
 
-    this.setState({ stars: newStars });
-  }
+    setStars(newStars);
+  };
 
-  render() {
-    return (
-      <div ref={this.universeRef} id="universe">
-        {this.state.stars.map((star) => (
-          <div
-            key={star.key}
-            className={star.className}
-            style={star.style}
-          ></div>
-        ))}
-      </div>
-    );
-  }
-}
+  return (
+    <div ref={universeRef} id="universe">
+      {stars.map((star) => (
+        <div key={star.key} className={star.className} style={star.style}></div>
+      ))}
+    </div>
+  );
+};
 
 export default Universe;
