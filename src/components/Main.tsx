@@ -17,7 +17,8 @@ const Main: React.FC<Props> = () => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState<PlanetInfo[]>([]);
-  const [pageInfo] = useState<PageInfo>({
+
+  const [pageInfo, setPageInfo] = useState<PageInfo>({
     count: 0,
     next: null,
     pages: 0,
@@ -29,15 +30,28 @@ const Main: React.FC<Props> = () => {
 
   const updateSearchQuery = (value: string) => {
     setSearchQuery(value);
-    fetchDataForList(value);
+    fetchDataForList(value, 1);
   };
 
-  const fetchDataForList = (query: string | null) => {
-    fetchDataForPlanetList(query, setIsLoaded, setItems, setError);
+  const fetchDataForList = (query: string, page: number) => {
+    fetchDataForPlanetList(
+      query,
+      page,
+      setIsLoaded,
+      setItems,
+      setError,
+      setPageInfo
+    );
   };
+
+  const isEmpty = items.length === 0;
 
   useEffect(() => {
-    fetchDataForList(searchQuery);
+    if (searchQuery && currentPage !== 1) {
+      setSearchParams({ page: '1' });
+    } else {
+      fetchDataForList(searchQuery, currentPage);
+    }
   }, [currentPage, searchQuery]);
 
   const handleNavigate = (newPage: number) => {
@@ -62,6 +76,7 @@ const Main: React.FC<Props> = () => {
           currentPage={currentPage}
           info={pageInfo}
           onNavigate={handleNavigate}
+          isEmpty={isEmpty}
         />
       </div>
     </div>
