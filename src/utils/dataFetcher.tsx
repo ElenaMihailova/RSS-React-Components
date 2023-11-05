@@ -1,8 +1,11 @@
-import { PlanetInfo } from '../components/PlanetList/PlanetInfoTypes';
+import { ProductInfo } from '../components/PlanetList/ProductInfoTypes';
 import { PageInfo } from '../components/Pagination/Pagination';
 
-export const getAllData = async (url: string): Promise<PlanetInfo[]> => {
-  let results: PlanetInfo[] = [];
+export const getAllData = async (
+  url: string
+): Promise<{ items: ProductInfo[]; total: number }> => {
+  let results: ProductInfo[] = [];
+  let total = 0;
   let fetchUrl = url;
   let shouldContinue = true;
 
@@ -12,39 +15,52 @@ export const getAllData = async (url: string): Promise<PlanetInfo[]> => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
-    console.log('Полученные данные:', data);
-    results = results.concat(data.results as PlanetInfo[]);
+
+    results = results.concat(data.products as ProductInfo[]);
+    total = data.total;
+
     if (data.next) {
       fetchUrl = data.next;
     } else {
       shouldContinue = false;
     }
   }
-  return results;
+
+  return { items: results, total: total };
 };
 
-export const fetchDataForPlanetList = async (
+export const fetchDataForProductList = async (
   searchQuery: string | null,
+  page: number,
+  limit: number,
   setIsLoaded: (isLoaded: boolean) => void,
-  setItems: (items: PlanetInfo[]) => void,
+  setItems: (items: ProductInfo[]) => void,
   setError: (error: Error) => void,
-  setPageInfo: (info: PageInfo) => void,
-  itemsPerPage: number
+  setPageInfo: (info: PageInfo) => void
 ) => {
-  const baseUrl = 'https://swapi.dev/api/planets/';
-  const searchParam = searchQuery
-    ? `search=${encodeURIComponent(searchQuery)}&`
-    : '';
+  const baseUrl = 'https://dummyjson.com/products';
+  const url = searchQuery
+    ? `${baseUrl}/search?q=${encodeURIComponent(searchQuery)}`
+    : `${baseUrl}?limit=${limit}&skip=${(page - 1) * limit}`;
 
   setIsLoaded(false);
 
   try {
-    const allData = await getAllData(`${baseUrl}?${searchParam}`);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
     setIsLoaded(true);
-    setItems(allData);
+    setItems(data.products);
+
+    const totalPages = searchQuery
+      ? Math.ceil(data.total / data.products.length)
+      : Math.ceil(data.total / limit);
+
     setPageInfo({
-      count: allData.length,
-      pages: Math.ceil(allData.length / itemsPerPage),
+      count: data.total,
+      pages: totalPages,
     });
   } catch (error) {
     setIsLoaded(true);

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Search from './Search/Search';
-import PlanetList from './PlanetList/PlanetList';
 import Universe from './Universe/Universe';
 import './Main.css';
 import Pagination, { PageInfo } from './Pagination/Pagination';
-import { fetchDataForPlanetList } from '../utils/dataFetcher';
-import { PlanetInfo } from './PlanetList/PlanetInfoTypes';
+import { fetchDataForProductList } from '../utils/dataFetcher';
+import { ProductInfo } from './PlanetList/ProductInfoTypes';
+import ProductList from './PlanetList/ProductList';
 
 type Props = {
   children?: JSX.Element;
@@ -16,9 +17,8 @@ const Main: React.FC<Props> = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [error, setError] = useState<Error | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [items, setItems] = useState<PlanetInfo[]>([]);
+  const [items, setItems] = useState<ProductInfo[]>([]);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const [currentItems, setCurrentItems] = useState<PlanetInfo[]>([]);
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     count: 0,
@@ -28,43 +28,58 @@ const Main: React.FC<Props> = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
-  const updateSearchQuery = (value: string) => {
-    setSearchQuery(value);
-    fetchDataForList(value);
-    setSearchParams({ page: '1' });
-  };
-
-  const fetchDataForList = (query: string) => {
-    fetchDataForPlanetList(
-      query,
-      setIsLoaded,
+  const updateSearchQuery = useCallback(
+    (value: string) => {
+      setSearchQuery(value);
+      fetchDataForProductList(
+        value,
+        1,
+        itemsPerPage,
+        setIsLoaded,
+        setItems,
+        setError,
+        setPageInfo
+      );
+      setSearchParams({ page: '1' });
+    },
+    [
+      itemsPerPage,
       setItems,
+      setIsLoaded,
       setError,
       setPageInfo,
-      itemsPerPage
-    );
-  };
+      setSearchParams,
+    ]
+  );
 
-  const isEmpty = items.length === 0;
+  const fetchDataForList = useCallback(
+    (query: string, page: number, limit: number) => {
+      fetchDataForProductList(
+        query,
+        page,
+        limit,
+        setIsLoaded,
+        setItems,
+        setError,
+        setPageInfo
+      );
+    },
+    []
+  );
 
   useEffect(() => {
-    fetchDataForList(searchQuery);
-  }, []);
-
-  useEffect(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const currentItems = items.slice(start, end);
-    setCurrentItems(currentItems);
-  }, [items, currentPage, itemsPerPage]);
+    fetchDataForList(searchQuery, currentPage, itemsPerPage);
+  }, [searchQuery, currentPage, itemsPerPage, fetchDataForList]);
 
   const handleNavigate = (newPage: number) => {
-    setSearchParams({ page: newPage.toString() });
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('page', newPage.toString());
+    setSearchParams(newSearchParams);
   };
 
   const handleItemsPerPageChange = (newItemsPerPage: number) => {
     setItemsPerPage(newItemsPerPage);
-    fetchDataForList(searchQuery);
+    fetchDataForList(searchQuery, 1, newItemsPerPage);
     setSearchParams({ page: '1' });
   };
 
@@ -76,22 +91,19 @@ const Main: React.FC<Props> = () => {
       <div className="search-result">
         {' '}
         <Search onSearchSubmit={updateSearchQuery} />
-        <PlanetList
+        <ProductList
           data={searchQuery}
           isLoaded={isLoaded}
-          items={currentItems}
+          items={items}
           error={error}
         />
-        {isLoaded && !isEmpty && (
-          <Pagination
-            currentPage={currentPage}
-            info={pageInfo}
-            itemsPerPage={itemsPerPage}
-            onNavigate={handleNavigate}
-            onItemsPerPageChange={handleItemsPerPageChange}
-            isEmpty={isEmpty}
-          />
-        )}
+        <Pagination
+          currentPage={currentPage}
+          info={pageInfo}
+          itemsPerPage={itemsPerPage}
+          onNavigate={handleNavigate}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
       </div>
     </div>
   );

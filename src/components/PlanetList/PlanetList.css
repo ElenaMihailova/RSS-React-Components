@@ -29,6 +29,8 @@
   border: 2px solid #603f8b;
   border-radius: 4px;
   padding: 20px;
+  height: 100px;
+  overflow: hidden;
 }
 
 .result__wrapper--all p {
@@ -41,4 +43,22 @@
   color: white;
   font-family: 'Courier New', Courier, monospace;
   font-size: 24px;
+}
+
+.result__wrapper--item {
+  width: auto;
+  height: 250px;
+  display: flex;
+  overflow-y: hidden;
+}
+
+.result__wrapper--item img {
+  height: 100%;
+  border-radius: 4px;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+}
+
+.result__wrapper--item p {
+  display: block;
 }

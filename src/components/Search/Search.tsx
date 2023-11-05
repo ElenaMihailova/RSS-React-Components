@@ -42,7 +42,7 @@ const Search: React.FC<SearchProps> = ({ onSearchSubmit }) => {
       <form className="search__form" onSubmit={handleClick}>
         <input
           type="text"
-          placeholder="Planet name"
+          placeholder="Product name"
           className="search__input"
           value={inputValue}
           onChange={handleInputChange}

@@ -13,7 +13,6 @@ interface PaginationProps {
   itemsPerPage: number;
   onNavigate: (page: number) => void;
   onItemsPerPageChange: (number: number) => void;
-  isEmpty: boolean;
 }
 
 const Pagination = ({
@@ -22,7 +21,6 @@ const Pagination = ({
   itemsPerPage,
   onNavigate,
   onItemsPerPageChange,
-  isEmpty,
 }: PaginationProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -53,7 +51,7 @@ const Pagination = ({
       </select>
       <button
         type="button"
-        disabled={currentPage === 1 || isEmpty}
+        disabled={currentPage === 1}
         className="pagination__button pagination__button--prev"
         onClick={() => setPage(currentPage - 1)}
       >
@@ -63,7 +61,7 @@ const Pagination = ({
       <button
         type="button"
         className="pagination__button pagination__button--next"
-        disabled={currentPage === info.pages || isEmpty}
+        disabled={currentPage === info.pages}
         onClick={() => setPage(currentPage + 1)}
       >
         &gt;
