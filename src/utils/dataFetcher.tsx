@@ -54,9 +54,10 @@ export const fetchDataForProductList = async (
     setIsLoaded(true);
     setItems(data.products);
 
-    const totalPages = searchQuery
-      ? Math.ceil(data.total / data.products.length)
-      : Math.ceil(data.total / limit);
+    const totalPages =
+      data.products.length === 0
+        ? 1
+        : Math.ceil(data.total / (searchQuery ? data.products.length : limit));
 
     setPageInfo({
       count: data.total,
