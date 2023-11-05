@@ -81,14 +81,16 @@ const Main: React.FC<Props> = () => {
           items={currentItems}
           error={error}
         />
-        <Pagination
-          currentPage={currentPage}
-          info={pageInfo}
-          itemsPerPage={itemsPerPage}
-          onNavigate={handleNavigate}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          isEmpty={isEmpty}
-        />
+        {isLoaded && !isEmpty && (
+          <Pagination
+            currentPage={currentPage}
+            info={pageInfo}
+            itemsPerPage={itemsPerPage}
+            onNavigate={handleNavigate}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            isEmpty={isEmpty}
+          />
+        )}
       </div>
     </div>
   );
