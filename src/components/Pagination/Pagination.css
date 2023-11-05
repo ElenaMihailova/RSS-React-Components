@@ -1,0 +1,64 @@
+.pagination {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  padding: 30px;
+}
+
+.pagination__button {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  transition: all 200ms ease-in;
+  cursor: pointer;
+  background: #a16ae8;
+  color: white;
+  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.pagination__button:hover,
+.pagination__button:focus,
+.pagination__button:active {
+  outline: none;
+  background-color: #603f8b;
+  border: none;
+}
+
+.pagination__page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.pagination__button:disabled {
+  cursor: auto;
+  background-color: transparent;
+}
+
+.pagination__items-per-page {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  margin-right: 20px;
+  background-color: transparent;
+  color: #603f8b;
+  font-family: 'Courier New', Courier, monospace;
+  border: 1px solid #603f8b;
+  border-radius: 4px;
+}
