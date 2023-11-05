@@ -31,6 +31,7 @@ const Main: React.FC<Props> = () => {
   const updateSearchQuery = (value: string) => {
     setSearchQuery(value);
     fetchDataForList(value);
+    setSearchParams({ page: '1' });
   };
 
   const fetchDataForList = (query: string) => {
